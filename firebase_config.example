@@ -1,0 +1,123 @@
+// firebase_config.example
+// Configuration Firebase pour Flutter
+// Copier dans mobile/lib/config/firebase_config.dart
+
+import 'package:firebase_core/firebase_core.dart';
+
+class FirebaseConfig {
+  // FIREBASE PROJECT INFO
+  // À récupérer depuis Firebase Console > Project Settings
+  
+  static const String projectId = 'attendance-qr-upc';
+  static const String appId = 'votre_app_id_ici';
+  static const String apiKey = 'votre_api_key_ici';
+  static const String messagingSenderId = 'votre_sender_id';
+  
+  // ANDROID CONFIG (depuis google-services.json)
+  static const String androidMobilesdkAppId = '1:xxx:android:xxx';
+  
+  // IOS CONFIG (depuis GoogleService-Info.plist)  
+  static const String iosBundleId = 'cd.upc.attendanceqr';
+  static const String iosMobilesdkAppId = '1:xxx:ios:xxx';
+}
+
+// MAIN.DART - INITIALISATION FIREBASE
+/*
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialiser Firebase
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: FirebaseConfig.apiKey,
+      appId: FirebaseConfig.appId,
+      messagingSenderId: FirebaseConfig.messagingSenderId,
+      projectId: FirebaseConfig.projectId,
+    ),
+  );
+  
+  runApp(const MyApp());
+}
+*/
+
+// OU PLUS SIMPLE (recommandé) :
+// Utiliser FlutterFire CLI pour générer automatiquement la config
+// 
+// 1. Installer FlutterFire CLI:
+//    dart pub global activate flutterfire_cli
+//
+// 2. Login Firebase:
+//    firebase login
+//
+// 3. Générer config Firebase:
+//    flutterfire configure
+//
+// Cela crée automatiquement firebase_options.dart
+// et ajoute google-services.json + GoogleService-Info.plist
+
+// COLLECTIONS FIRESTORE
+
+/*
+users/
+  {uid}/
+    - email: string
+    - nom: string
+    - prenom: string
+    - role: "PROF" | "ETUDIANT"
+
+schedules/
+  {scheduleId}/
+    - nomCours: string
+    - createdBy: string (user uid)
+    - dateHeure: Timestamp
+    - qrToken: string
+    - qrExpires: Timestamp (optionnel)
+
+attendances/
+  {attendanceId}/
+    - scheduleId: string
+    - userId: string
+    - userName: string (denormalized)
+    - timestamp: Timestamp
+*/
+
+// USERS DE TEST
+/*
+Dans Firebase Console > Authentication > Users:
+
+1. prof@upc.cd / password123
+   Role: PROF
+
+2. etudiant@upc.cd / password123
+   Role: ETUDIANT
+
+Puis créer documents correspondants dans Firestore > users collection
+*/
+
+// FIRESTORE RULES EXEMPLE (mode développement)
+/*
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
+    }
+    
+    match /schedules/{scheduleId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && 
+                       get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'PROF';
+    }
+    
+    match /attendances/{attendanceId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+    }
+  }
+}
+*/
