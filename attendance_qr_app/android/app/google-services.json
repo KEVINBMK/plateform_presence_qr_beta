@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "28589149936",
+    "project_id": "attendance-qr-upc",
+    "storage_bucket": "attendance-qr-upc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28589149936:android:970f57b74bba35c420bc35",
+        "android_client_info": {
+          "package_name": "com.upc.attendance_qr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAheO0IAzph7OMwHz5AR9YAy7rKuA36XKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
