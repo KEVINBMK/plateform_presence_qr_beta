@@ -10,6 +10,17 @@ Bienvenue dans l'application de gestion de presence par QR Code ! Cette app a et
 
 ---
 
+## Captures d'Ecran
+
+<div align="center">
+  <img src="../images/Screenshot_20260213_025204.png" width="200" alt="Ecran 1"/>
+  <img src="../images/Screenshot_20260213_025404.png" width="200" alt="Ecran 2"/>
+  <img src="../images/Screenshot_20260213_025429.png" width="200" alt="Ecran 3"/>
+  <img src="../images/Screenshot_20260213_025612.png" width="200" alt="Ecran 4"/>
+</div>
+
+---
+
 ## Demarrage Rapide
 
 ### Prerequis :
