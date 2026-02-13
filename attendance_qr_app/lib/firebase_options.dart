@@ -50,11 +50,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBjRwn7VBLXaXgLFrJQ8KvC3xGZ9yKwP8Q',
-    appId: '1:123456789:android:abcdef123456',
-    messagingSenderId: '123456789',
+    apiKey: 'AIzaSyAheO0IAzph7OMwHz5AR9YAy7rKuA36XKE',
+    appId: '1:28589149936:android:970f57b74bba35c420bc35',
+    messagingSenderId: '28589149936',
     projectId: 'attendance-qr-upc',
-    storageBucket: 'attendance-qr-upc.appspot.com',
+    storageBucket: 'attendance-qr-upc.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

@@ -1,0 +1,93 @@
+# ========================================
+# COMMANDES A EXECUTER (COPIER-COLLER)
+# ========================================
+
+# -------------------------------------------
+# OPTION 1 : VOUS AVEZ NODE.JS ET NPM
+# -------------------------------------------
+
+# Etape 1 : Installer Firebase CLI
+npm install -g firebase-tools
+
+# Etape 2 : Se connecter a Firebase
+firebase login
+
+# Etape 3 : Deployer les index (CRITIQUE !)
+firebase deploy --only firestore:indexes
+
+# Etape 4 : Deployer les regles de securite
+firebase deploy --only firestore:rules
+
+# Etape 5 : Lancer l'application
+flutter run
+
+
+# -------------------------------------------
+# OPTION 2 : VOUS N'AVEZ PAS NODE.JS
+# -------------------------------------------
+
+# Solution A : Cliquez sur le lien dans votre erreur
+# Le lien ressemble a :
+# https://console.firebase.google.com/v1/r/project/attendance-qr-upc/firestore/indexes?create_composite=...
+
+# Solution B : Allez manuellement dans la console
+# 1. Ouvrez : https://console.firebase.google.com/project/attendance-qr-upc/firestore/indexes
+# 2. Cliquez sur "Ajouter un index composite"
+# 3. Creez les 4 index suivants :
+
+# Index 1 :
+#   Collection : attendances
+#   Champs : scheduleId (Ascending), timestamp (Descending)
+
+# Index 2 :
+#   Collection : attendances
+#   Champs : userId (Ascending), timestamp (Descending)
+
+# Index 3 : ⚠️ LE PLUS IMPORTANT ⚠️
+#   Collection : schedules
+#   Champs : createdBy (Ascending), dateHeure (Descending)
+
+# Index 4 :
+#   Collection : schedules
+#   Champs : qrToken (Ascending), isActive (Ascending)
+
+# 4. Attendez que tous les index passent de "Building" a "Enabled"
+# 5. Lancez l'application : flutter run
+
+
+# -------------------------------------------
+# EN CAS DE PROBLEME
+# -------------------------------------------
+
+# Nettoyer le projet a nouveau
+.\fix_all.ps1
+
+# Verifier les logs detailles
+flutter run --verbose
+
+# Verifier Firebase
+firebase projects:list
+firebase use attendance-qr-upc
+
+
+# -------------------------------------------
+# VERIFICATION
+# -------------------------------------------
+
+# Apres deploiement, verifier :
+# 1. Console Firebase > Firestore > Indexes
+#    Tous les index doivent etre "Enabled"
+# 
+# 2. Console Firebase > Firestore > Regles
+#    La date de publication doit etre recente
+# 
+# 3. L'application doit demarrer sans erreur
+
+
+# ========================================
+# RESUME : UNE SEULE COMMANDE CRITIQUE
+# ========================================
+
+firebase deploy --only firestore:indexes
+
+# ⚠️ Sans cette commande, l'application NE PEUT PAS FONCTIONNER ! ⚠️

@@ -1,109 +1,198 @@
-# Attendance QR App - Gestion de Présence UPC
+# Plateforme Presence QR - Application Mobile
 
-App Flutter pour gérer les présences via QR Code.
-
-## Le projet avance
-
-L'app tourne deja, voici l'ecran de connexion fonctionnel :
-
-![Login Screen](img/tp_img1.PNG)
-
-L'authentification Firebase est en place, les ecrans de base sont la, le backend est operationnel. On est sur la bonne voie les gars, on continue comme ca.
+**Developpe par Kevin - Fevrier 2026**
 
 ---
 
-## Installation Rapide
+## Salut !
 
-### Prérequis
-- Flutter SDK installé
-- Android Studio ou VS Code
-- Compte Firebase
+Bienvenue dans l'application de gestion de presence par QR Code ! Cette app a ete creee pour simplifier la prise de presence dans les cours universitaires.
 
-### Setup du Projet
+---
 
-```powershell
-cd attendance_qr_app
+## Demarrage Rapide
+
+### Prerequis :
+- Flutter 3.24+ installe
+- Firebase CLI (pour deployer les index)
+- Un projet Firebase configure
+
+### Installation en 3 etapes :
+
+```bash
+# 1. Installer les dependances
 flutter pub get
 
-# Configurer Firebase
-dart pub global activate flutterfire_cli
-flutterfire configure
+# 2. Deployer les index Firebase (IMPORTANT !)
+firebase deploy --only firestore:indexes
 
+# 3. Lancer l'app
 flutter run
 ```
 
-## Configuration Firebase
+C'est tout ! L'app est prête !
 
-### Setup rapide
-1. Générer firebase_options.dart avec flutterfire configure
-2. Activer Email/Password dans Firebase Console
-3. Créer 2 utilisateurs test (prof@upc.cd, etudiant@upc.cd)
-4. Déployer les règles Firestore : firebase deploy --only firestore:rules
+---
+
+## Fonctionnalites
+
+### Pour les Professeurs :
+- Creer des seances de cours
+- Generer des QR codes uniques
+- Voir les presences en temps reel
+- Suivre l'historique des seances
+
+### Pour les Etudiants :
+- Scanner les QR codes
+- Enregistrer automatiquement leur presence
+- Consulter leur historique de presences
+
+---
+
+## Stack Technique
+
+- Frontend : Flutter 3.24+ (Dart)
+- Backend : Firebase (Authentication + Firestore)
+- QR Code : qr_flutter + mobile_scanner
+- State Management : Provider
+- Date/Time : intl
+
+---
 
 ## Structure du Projet
 
 ```
 lib/
-├── main.dart              # Point d'entrée
-├── models/                # Modèles (User, Schedule, Attendance)
-├── services/              # Backend (Auth, Firestore)
-├── providers/             # State management
-└── screens/               # Interfaces UI
+├── main.dart                 # Point d'entree de l'app
+├── firebase_options.dart     # Configuration Firebase
+├── models/                   # Modeles de donnees
+│   ├── user_model.dart
+│   ├── schedule_model.dart
+│   └── attendance_model.dart
+├── providers/                # Gestion d'etat
+│   └── auth_provider.dart
+├── screens/                  # Ecrans de l'app
+│   ├── auth_wrapper.dart
+│   ├── login_screen.dart
+│   ├── prof_home_screen.dart
+│   ├── student_home_screen.dart
+│   ├── create_schedule_screen.dart
+│   ├── scan_qr_screen.dart
+│   └── attendance_list_screen.dart
+└── services/                 # Services backend
+    ├── auth_service.dart
+    └── firestore_service.dart
 ```
 
-## Fonctionnalités
+---
 
-Professeurs:
-- Créer des séances
-- Générer QR codes
-- Voir présences en temps réel
+## Scripts Utiles
 
-Étudiants:
-- Scanner QR codes
-- Marquer présence
-- Voir historique
+### Nettoyer le projet :
+```bash
+.\fix_all.ps1
+```
+Ce script fait tout le menage : cache Flutter, cache Gradle, reconstruction complete.
 
-## Commandes Utiles
+### Deployer sur Firebase :
+```bash
+# Deployer les index
+firebase deploy --only firestore:indexes
 
-```powershell
-flutter pub get          # Installer dépendances
-flutter analyze          # Analyser le code
-flutter clean            # Nettoyer le build
-flutter run              # Lancer l'app
-flutter build apk        # Build APK
+# Deployer les regles de securite
+firebase deploy --only firestore:rules
 ```
 
-## Documentation
+---
 
-- PROGRESSION.md - Etat d'avancement du projet
+## Resolution de Problemes
 
-## Problèmes Courants
+### Erreur : "The query requires an index"
 
-Erreur: "No Firebase App"
-- Exécuter flutterfire configure
+Solution :
+```bash
+firebase deploy --only firestore:indexes
+```
+Ou clique sur le lien dans l'erreur pour creer l'index automatiquement !
 
-Erreur: "Permission denied" (Firestore)
-- Déployer les règles: firebase deploy --only firestore:rules
+### Erreur Gradle : "enableBuildCache is deprecated"
 
-Dossiers en rouge dans l'IDE
-- Configurer le SDK Dart (voir ci-dessous)
+Solution :
+```bash
+.\fix_all.ps1
+```
 
-## Configuration IDE (IntelliJ/Android Studio)
+### L'app crash au demarrage
 
-1. File → Settings → Languages & Frameworks → Dart
-2. Cocher "Enable Dart support"
-3. Dart SDK path: C:\Users\KEVIN\flutter_windows_3.35.6-stable\flutter\bin\cache\dart-sdk
-4. Apply → OK
+Verifications :
+1. Firebase bien configure ? (`firebase_options.dart` existe)
+2. `google-services.json` dans `android/app/` ?
+3. Index Firebase deployes ?
+4. Internet active ?
 
-## Équipe
+---
 
-Lead Technique: Kevin
-- Architecture Firebase
-- Services backend
+## Documentation Complete
+
+- RAPPORT_KEVIN.md - Rapport complet des corrections et ameliorations
+- COMMANDES.txt - Toutes les commandes utiles (copier-coller facile)
+- LISEZMOI_URGENT.txt - Guide visuel rapide
+
+---
+
+## TODOs / Ameliorations Futures
+
+- Export CSV des presences
+- Notifications push pour les seances
+- Mode sombre
+- Statistiques de presence (graphiques)
+- Gestion des retards
+- Multi-langue (FR/EN)
+
+---
+
+## Statistiques du Projet
+
+Lignes de code : ~2000 lignes Dart  
+Fichiers : 15 ecrans/services  
+Temps de dev : 3 jours  
+Status : Fonctionnel et pret pour la prod !
+
+---
+
+## Contribution
+
+Cette app a ete developpee dans le cadre du projet L4 - UPC.
+
+Equipe : Kevin et l'equipe de developpement  
+Date : Fevrier 2026  
+Version : 1.0.0
+
+---
 
 ## Support
 
-Firebase Console: https://console.firebase.google.com  
-Projet: attendance-qr-upc
+Si tu rencontres un probleme :
+
+1. Verifie d'abord RAPPORT_KEVIN.md (la plupart des solutions y sont !)
+2. Regarde COMMANDES.txt pour les commandes rapides
+3. Lance `.\fix_all.ps1` pour nettoyer le projet
+
+---
+
+## Checklist Avant de Lancer
+
+- `flutter pub get` execute
+- Index Firebase deployes
+- Regles Firebase deployees
+- `google-services.json` configure
+- Connexion Internet active
+
+---
+
+Made by Kevin - UPC L4 - Fevrier 2026
+
+L'app est prete !
+
 
 

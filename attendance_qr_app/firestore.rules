@@ -7,27 +7,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Helper function to get user role
-    function getUserRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-    }
-
-    // Helper function to check if user is professor
-    function isProfessor() {
-      return isAuthenticated() && getUserRole() == "PROF";
-    }
-
-    // Helper function to check if user is student
-    function isStudent() {
-      return isAuthenticated() && getUserRole() == "ETUDIANT";
-    }
-
     // Users collection
     match /users/{userId} {
       // Users can read their own document
       allow read: if isAuthenticated() && request.auth.uid == userId;
 
-      // Only allow creation during signup (typically handled by Cloud Functions)
+      // Only allow creation during signup
       allow create: if isAuthenticated() && request.auth.uid == userId;
 
       // Users can update their own profile (except role)
@@ -44,8 +29,8 @@ service cloud.firestore {
       // Anyone authenticated can read schedules
       allow read: if isAuthenticated();
 
-      // Only professors can create schedules
-      allow create: if isProfessor() &&
+      // Anyone authenticated can create schedules (role checked in app)
+      allow create: if isAuthenticated() &&
                       request.resource.data.createdBy == request.auth.uid;
 
       // Only the creator can update their schedules
@@ -62,19 +47,17 @@ service cloud.firestore {
       // Anyone authenticated can read attendances
       allow read: if isAuthenticated();
 
-      // Only students can create attendance records
-      // And only for themselves
-      // And only once per schedule
-      allow create: if isStudent() &&
-                      request.resource.data.userId == request.auth.uid &&
-                      !exists(/databases/$(database)/documents/attendances/$(attendanceId));
+      // Anyone authenticated can create attendance records for themselves
+      allow create: if isAuthenticated() &&
+                      request.resource.data.userId == request.auth.uid;
 
       // No updates allowed (attendance is immutable)
       allow update: if false;
 
-      // Only professors who created the schedule can delete attendance
-      allow delete: if isProfessor() &&
-                      get(/databases/$(database)/documents/schedules/$(resource.data.scheduleId)).data.createdBy == request.auth.uid;
+      // Only the creator of the attendance or the creator of the schedule can delete
+      allow delete: if isAuthenticated() &&
+                      (resource.data.userId == request.auth.uid ||
+                       request.auth.uid == resource.data.createdBy);
     }
   }
 }

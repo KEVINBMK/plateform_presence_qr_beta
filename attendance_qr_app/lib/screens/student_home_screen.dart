@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import '../providers/auth_provider.dart';
+import 'scan_qr_screen.dart';
 
 class StudentHomeScreen extends StatelessWidget {
   const StudentHomeScreen({super.key});
@@ -81,10 +84,10 @@ class StudentHomeScreen extends StatelessWidget {
               elevation: 4,
               child: InkWell(
                 onTap: () {
-                  // TODO: Navigation vers ScanQRScreen
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Scanner QR - En développement'),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ScanQrScreen(),
                     ),
                   );
                 },
@@ -112,7 +115,10 @@ class StudentHomeScreen extends StatelessWidget {
                           children: [
                             Text(
                               'Scanner QR Code',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
@@ -142,27 +148,120 @@ class StudentHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
+            // Liste des présences de l'étudiant
             Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.history,
-                      size: 64,
-                      color: Colors.grey[400],
+              child: user?.uid == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('attendances')
+                          .where('userId', isEqualTo: user!.uid)
+                          .orderBy('timestamp', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Erreur: ${snapshot.error}'),
+                          );
+                        }
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        final attendances = snapshot.data?.docs ?? [];
+
+                        if (attendances.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  size: 64,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Aucune présence enregistrée',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Scannez un QR code pour marquer votre présence',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[500],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          itemCount: attendances.length,
+                          itemBuilder: (context, index) {
+                            final attendance = attendances[index].data()
+                                as Map<String, dynamic>;
+                            final scheduleId = attendance['scheduleId'];
+                            final timestamp = attendance['timestamp'] as Timestamp?;
+
+                            return FutureBuilder<DocumentSnapshot>(
+                              future: FirebaseFirestore.instance
+                                  .collection('schedules')
+                                  .doc(scheduleId)
+                                  .get(),
+                              builder: (context, scheduleSnapshot) {
+                                final scheduleName =
+                                    scheduleSnapshot.data?.get('nomCours') ??
+                                        'Cours inconnu';
+
+                                return Card(
+                                  margin: const EdgeInsets.only(bottom: 8),
+                                  child: ListTile(
+                                    leading: CircleAvatar(
+                                      backgroundColor: Colors.green,
+                                      child: const Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      scheduleName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      timestamp != null
+                                          ? DateFormat('dd/MM/yyyy à HH:mm')
+                                              .format(timestamp.toDate())
+                                          : 'Date inconnue',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    trailing: Icon(
+                                      Icons.chevron_right,
+                                      color: Colors.grey[400],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        );
+                      },
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Aucune présence enregistrée',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
           ],
         ),
@@ -170,3 +269,4 @@ class StudentHomeScreen extends StatelessWidget {
     );
   }
 }
+

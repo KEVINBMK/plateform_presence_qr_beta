@@ -1,5 +1,6 @@
-package com.example.attendance_qr_app
+package com.upc.attendance_qr
 
 import io.flutter.embedding.android.FlutterActivity
 
 class MainActivity : FlutterActivity()
+

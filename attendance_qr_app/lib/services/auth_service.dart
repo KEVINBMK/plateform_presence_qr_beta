@@ -89,18 +89,40 @@ class AuthService {
   // Récupérer le profil utilisateur depuis Firestore
   Future<UserModel?> getUserProfile(String uid) async {
     try {
+      print('📥 Récupération du profil utilisateur: $uid');
+
       final doc = await _db.collection('users').doc(uid).get();
-      if (!doc.exists) return null;
-      return UserModel.fromFirestore(doc.data()!, uid);
+
+      if (!doc.exists) {
+        print('⚠️ Document utilisateur inexistant pour UID: $uid');
+        return null;
+      }
+
+      final data = doc.data();
+      if (data == null) {
+        print('⚠️ Données utilisateur nulles pour UID: $uid');
+        return null;
+      }
+
+      print('✅ Profil utilisateur récupéré: ${data['email']}');
+      return UserModel.fromFirestore(data, uid);
     } catch (e) {
+      print('❌ Erreur récupération profil: $e');
+      if (e.toString().contains('permission')) {
+        throw Exception('Erreur de permissions. Impossible de lire votre profil.');
+      }
       throw Exception('Erreur de récupération du profil: $e');
     }
   }
 
   // Stream du profil utilisateur
   Stream<UserModel?> getUserProfileStream(String uid) {
+    print('📡 Stream profil utilisateur: $uid');
     return _db.collection('users').doc(uid).snapshots().map((doc) {
-      if (!doc.exists) return null;
+      if (!doc.exists || doc.data() == null) {
+        print('⚠️ Document utilisateur inexistant dans stream');
+        return null;
+      }
       return UserModel.fromFirestore(doc.data()!, uid);
     });
   }
